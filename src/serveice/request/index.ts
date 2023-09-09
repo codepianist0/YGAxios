@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import type { YGRequestConfig } from "./type.t";
 
 
@@ -18,7 +18,7 @@ class YGRequest {
     })
     this.instance.interceptors.response.use((res) => {
       console.log("全局响应拦截");
-      return res
+      return res.data
     },(err) =>{ 
       console.log(err);
     })
@@ -34,16 +34,16 @@ class YGRequest {
     )
 
   }
-
-  request(config: YGRequestConfig) {
+  request<T = any>(config: YGRequestConfig<T>) {
     // 3. 给单个网络请求添加拦截器
     // 不能直接instance添加是因为会添加到实例中,单个网络请求的拦截不需要添加到实例中
     // 只要获取到拦截后修改的参数和结果就行
     if(config.interceptors?.requestSuccessFn) {
       config = config.interceptors.requestSuccessFn(config)
     }
-    return new Promise((resolve, reject) => {
-      this.instance.request(config).then(res => {
+    // 4. 细节promise的使用了泛型,默认返回的类型是unknow类型
+    return new Promise<T>((resolve, reject) => {
+      this.instance.request<any, T>(config).then(res => {
         if(config.interceptors?.responseSuccessFn) {
           res = config.interceptors.responseSuccessFn(res)
         }

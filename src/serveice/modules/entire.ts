@@ -28,4 +28,6 @@ ygRequest2.request({
       return res
     },
   }
+}).then(res => {
+  console.log(res);
 })

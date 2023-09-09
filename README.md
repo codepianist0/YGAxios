@@ -1,43 +1,3 @@
-# 11_axios封装
-
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-pnpm dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-pnpm build
-```
 # axios封装实现
 
 ## 1. 基本实现
@@ -283,3 +243,10 @@ request(config: YGRequestConfig) {
   }
 ```
 
+## 3. 返回值的类型处理
+
+1. 因为前面封装单个网络请求拦截器的时候，new了一个Promise，promise的返回值的类型是unknown，所以可以在new Promise中添加泛型（AxiosResponse）
+2. 返回的数据，我们想直接得到data，在全局的响应拦截中return res.data
+3. 蛋柿这样会出现问题，返回的类型不是AxiosResponse了
+4. 然后我们可以给YGRequest.request设置一个泛型,泛型的默认值值是any，就是如果传入泛型，默认为any，如果传入，则为传入的类型, promise的泛型直接使用这个T就行
+5. 然后就是config.interceptors.responseSuccessFn的返回值类型没有修改过来,就需要去到YGResponseConfig中修改它的类型,同样也是使用泛型,当不传入的时候,默认值是AxiosResponse
